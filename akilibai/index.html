@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SwahiliBot — Msaidizi wako wa Akili Bandia</title>
+<meta name="description" content="SwahiliBot ni msaidizi wa AI kwa lugha ya Kiswahili, uliyeundwa kwa ajili ya watumiaji wa Afrika." />
+
+<!-- Tailwind CSS kupitia CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Fonti safi kutoka Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Sora', 'sans-serif'],
+        },
+        colors: {
+          bg: {
+            light: '#F4F5FC',
+            dark: '#0A0D1C',
+          },
+          panel: {
+            light: '#FFFFFF',
+            dark: '#141827',
+          },
+          ink: {
+            light: '#1B1F30',
+            dark: '#E8E9F7',
+          },
+          muted: {
+            light: '#6B7089',
+            dark: '#9497B5',
+          },
+          accent: {
+            DEFAULT: '#6C5CE7',
+            hover: '#5847D6',
+            soft: '#EDEAFD',
+          },
+          accent2: {
+            DEFAULT: '#12B76A',
+          },
+          border: {
+            light: '#E4E5F5',
+            dark: '#242A45',
+          }
+        },
+        keyframes: {
+          fadeInUp: {
+            '0%': { opacity: 0, transform: 'translateY(8px)' },
+            '100%': { opacity: 1, transform: 'translateY(0)' },
+          },
+          bounce1: {
+            '0%, 80%, 100%': { transform: 'scale(0.6)', opacity: 0.4 },
+            '40%': { transform: 'scale(1)', opacity: 1 },
+          }
+        },
+        animation: {
+          fadeInUp: 'fadeInUp 0.35s ease-out',
+          bounce1: 'bounce1 1.2s infinite ease-in-out',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at 15% 0%, #EDEAFD 0%, transparent 45%),
+                radial-gradient(circle at 100% 20%, #E1F9EE 0%, transparent 40%),
+                #F4F5FC;
+  }
+  html.dark body {
+    background: radial-gradient(circle at 15% 0%, rgba(108,92,231,0.16) 0%, transparent 45%),
+                radial-gradient(circle at 100% 15%, rgba(18,183,106,0.10) 0%, transparent 40%),
+                #0A0D1C;
+  }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #C9C3B4; border-radius: 8px; }
+  .dark ::-webkit-scrollbar-thumb { background: #4A4741; }
+
+  textarea { field-sizing: content; }
+
+  .dot { animation-delay: var(--delay); }
+
+  .prose-msg p { margin-bottom: 0.6em; }
+  .prose-msg p:last-child { margin-bottom: 0; }
+  .prose-msg pre {
+    background: #1E1E1C;
+    color: #EDEAE4;
+    padding: 0.85rem 1rem;
+    border-radius: 0.6rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    margin: 0.6em 0;
+  }
+  .prose-msg code {
+    font-family: 'Menlo', 'Consolas', monospace;
+    background: rgba(0,0,0,0.06);
+    padding: 0.1em 0.35em;
+    border-radius: 0.3em;
+    font-size: 0.85em;
+  }
+  .dark .prose-msg code { background: rgba(255,255,255,0.08); }
+  .prose-msg pre code { background: transparent; padding: 0; }
+
+  .sidebar-transition { transition: margin-left 0.25s ease, width 0.25s ease; }
+</style>
+</head>
+
+<body class="text-ink-light dark:text-ink-dark transition-colors duration-300">
+
+<div class="flex h-screen overflow-hidden">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside id="sidebar" class="hidden md:flex flex-col w-72 shrink-0 bg-panel-light dark:bg-panel-dark border-r border-border-light dark:border-border-dark p-4 sidebar-transition">
+    <div class="flex items-center gap-2 mb-6 px-1">
+      <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white font-display font-semibold">S</div>
+      <span class="font-display text-lg font-semibold tracking-tight">SwahiliBot</span>
+    </div>
+
+    <button id="btnMazungumzoMapya"
+      class="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors text-sm font-medium mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      Mazungumzo Mapya
+    </button>
+
+    <div class="text-xs font-semibold text-muted-light dark:text-muted-dark px-2 mb-2 uppercase tracking-wide">Historia</div>
+    <div id="orodhaYaHistoria" class="flex-1 overflow-y-auto space-y-1 pr-1">
+      <!-- Historia ya mazungumzo itaonekana hapa -->
+    </div>
+
+    <button id="btnFungyaBeiSidebar"
+      class="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors text-sm font-medium mt-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3a9 9 0 110-18 9 9 0 010 18z" />
+      </svg>
+      Bei na Mipango
+    </button>
+
+    <button id="btnDeveloperSidebar"
+      class="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors text-sm font-medium mt-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12" />
+      </svg>
+      Developer API
+    </button>
+
+    <div class="pt-3 mt-3 border-t border-border-light dark:border-border-dark">
+      <p class="text-xs text-muted-light dark:text-muted-dark px-2 leading-relaxed">
+        SwahiliBot inachagua njia bora ya kukujibu kwa haraka na usahihi, kulingana na aina ya swali lako.
+      </p>
+    </div>
+  </aside>
+
+  <!-- ===================== ENEO KUU ===================== -->
+  <main class="flex-1 flex flex-col min-w-0">
+
+    <!-- Kichwa cha juu -->
+    <header class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border-light dark:border-border-dark bg-bg-light/80 dark:bg-bg-dark/80 backdrop-blur">
+      <div class="flex items-center gap-3">
+        <button id="btnToggleSidebar" class="md:hidden p-2 rounded-lg hover:bg-panel-light dark:hover:bg-panel-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-accent md:hidden flex items-center justify-center text-white font-display text-sm font-semibold">S</span>
+          <h1 class="font-display text-base md:text-lg font-medium">Mazungumzo na SwahiliBot</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Kiashiria cha matumizi ya leo (kinaonekana tu baada ya kuingia) -->
+        <div id="kiashiriaMatumizi" class="hidden text-xs px-2.5 py-1 rounded-full bg-panel-light dark:bg-panel-dark border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark">
+          <span id="matumiziYaLeo">0</span>/<span id="kikomoChaSiku">15</span> ujumbe leo
+        </div>
+
+        <!-- Kitufe cha "Nunua" / boresha kiwango -->
+        <button id="btnFungyaBei" class="hidden text-xs px-3 py-1.5 rounded-full bg-accent-soft dark:bg-accent/20 text-accent-hover dark:text-accent font-medium hover:brightness-95 transition">
+          Boresha Kiwango
+        </button>
+
+        <!-- Eneo la akaunti - halijaingia -->
+        <div id="eneoLaKabalYaKuingia" class="flex items-center gap-2">
+          <button id="btnFunguaIngia" class="text-sm px-3 py-1.5 rounded-lg hover:bg-panel-light dark:hover:bg-panel-dark font-medium transition-colors">Ingia</button>
+          <button id="btnFunguaJisajili" class="text-sm px-3 py-1.5 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors">Jisajili</button>
+        </div>
+
+        <!-- Eneo la akaunti - ameshaingia -->
+        <div id="eneoBaadaYaKuingia" class="hidden items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-ink-light dark:bg-ink-dark text-bg-light dark:text-bg-dark flex items-center justify-center text-xs font-semibold" id="herufiYaJina">W</div>
+          <button id="btnToka" class="text-xs text-muted-light dark:text-muted-dark hover:text-ink-light dark:hover:text-ink-dark transition-colors">Toka</button>
+        </div>
+
+        <button id="btnDarkMode" class="p-2.5 rounded-lg hover:bg-panel-light dark:hover:bg-panel-dark transition-colors" title="Badilisha mwonekano">
+          <svg id="iconMwezi" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <svg id="iconJua" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Eneo la mazungumzo -->
+    <div id="eneoLaChat" class="flex-1 overflow-y-auto px-4 md:px-0">
+      <div class="max-w-3xl mx-auto py-8 space-y-6" id="orodhaYaUjumbe">
+
+        <!-- Ujumbe wa mwanzo/karibisho -->
+        <div id="ukaribishoWaAwali" class="flex flex-col items-center justify-center text-center py-16 px-4">
+          <div class="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center text-white font-display text-2xl font-semibold mb-5">S</div>
+          <h2 class="font-display text-2xl md:text-3xl font-medium mb-2">Habari! Mimi ni SwahiliBot</h2>
+          <p class="text-muted-light dark:text-muted-dark max-w-md">
+            Niulize lolote — kuanzia mazungumzo ya kawaida hadi maswali magumu ya kiufundi.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-lg">
+            <button class="pendekezo text-left px-4 py-3 rounded-xl border border-border-light dark:border-border-dark hover:bg-panel-light dark:hover:bg-panel-dark transition-colors text-sm">
+              Nipe wazo la biashara ndogo Afrika Mashariki
+            </button>
+            <button class="pendekezo text-left px-4 py-3 rounded-xl border border-border-light dark:border-border-dark hover:bg-panel-light dark:hover:bg-panel-dark transition-colors text-sm">
+              Andika kazi ya Python ya kuhesabu riba
+            </button>
+            <button class="pendekezo text-left px-4 py-3 rounded-xl border border-border-light dark:border-border-dark hover:bg-panel-light dark:hover:bg-panel-dark transition-colors text-sm">
+              Nisaidie kuandika barua pepe ya kikazi
+            </button>
+            <button class="pendekezo text-left px-4 py-3 rounded-xl border border-border-light dark:border-border-dark hover:bg-panel-light dark:hover:bg-panel-dark transition-colors text-sm">
+              Changanua faida na hasara za AI kwa elimu Afrika
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Eneo la kuandika ujumbe -->
+    <div class="border-t border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark px-4 py-4">
+      <div class="max-w-3xl mx-auto">
+        <div id="kisandukuChaKuandika" class="flex items-end gap-2 bg-panel-light dark:bg-panel-dark border border-border-light dark:border-border-dark rounded-2xl px-3 py-2 shadow-sm focus-within:border-accent transition-colors">
+          <textarea
+            id="ingizoLaUjumbe"
+            rows="1"
+            placeholder="Andika ujumbe wako hapa..."
+            class="flex-1 resize-none bg-transparent outline-none text-sm md:text-base py-2 px-1 max-h-40 placeholder:text-muted-light dark:placeholder:text-muted-dark"
+          ></textarea>
+          <button id="btnTuma" disabled
+            class="shrink-0 w-9 h-9 rounded-xl bg-accent hover:bg-accent-hover disabled:bg-muted-light/40 disabled:cursor-not-allowed flex items-center justify-center text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-center text-xs text-muted-light dark:text-muted-dark mt-2.5">
+          SwahiliBot anaweza kufanya makosa. Thibitisha taarifa muhimu kabla ya kuzitumia.
+        </p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL: INGIA / JISAJILI ===================== -->
+<div id="modalAkaunti" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+  <div class="bg-panel-light dark:bg-panel-dark rounded-2xl shadow-xl w-full max-w-sm p-6 relative animate-fadeInUp">
+    <button class="btnFungaModal absolute top-4 right-4 text-muted-light dark:text-muted-dark hover:text-ink-light dark:hover:text-ink-dark">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <h3 id="kichwaChaModalAkaunti" class="font-display text-xl font-medium mb-1">Karibu tena</h3>
+    <p class="text-sm text-muted-light dark:text-muted-dark mb-5">Ingia ili kuendelea na mazungumzo yako.</p>
+
+    <form id="fomuAkaunti" class="space-y-3">
+      <div id="sehemuYaJina" class="hidden">
+        <label class="text-xs font-medium text-muted-light dark:text-muted-dark">Jina kamili</label>
+        <input type="text" id="ingizoJina" placeholder="Mfano: Asha Juma"
+          class="w-full mt-1 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none focus:border-accent text-sm" />
+      </div>
+      <div>
+        <label class="text-xs font-medium text-muted-light dark:text-muted-dark">Namba ya simu</label>
+        <input type="tel" id="ingizoSimu" placeholder="07XXXXXXXX"
+          class="w-full mt-1 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none focus:border-accent text-sm" />
+      </div>
+      <div>
+        <label class="text-xs font-medium text-muted-light dark:text-muted-dark">Password</label>
+        <input type="password" id="ingizoPassword" placeholder="••••••••"
+          class="w-full mt-1 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none focus:border-accent text-sm" />
+      </div>
+
+      <p id="hitilafuYaAkaunti" class="hidden text-xs text-red-600 dark:text-red-400"></p>
+
+      <button type="submit" id="btnTumaFomuAkaunti"
+        class="w-full py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors">
+        Ingia
+      </button>
+    </form>
+
+    <p class="text-xs text-center text-muted-light dark:text-muted-dark mt-4">
+      <span id="maandishiYaKubadilisha">Huna akaunti?</span>
+      <button id="btnBadilishaHaliYaModal" class="text-accent font-medium hover:underline">Jisajili</button>
+    </p>
+  </div>
+</div>
+
+<!-- ===================== MODAL: BEI / MALIPO ===================== -->
+<div id="modalBei" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 overflow-y-auto py-8">
+  <div class="bg-panel-light dark:bg-panel-dark rounded-2xl shadow-xl w-full max-w-3xl p-6 relative animate-fadeInUp">
+    <button class="btnFungaModal absolute top-4 right-4 text-muted-light dark:text-muted-dark hover:text-ink-light dark:hover:text-ink-dark">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <h3 class="font-display text-2xl font-medium mb-1 text-center">Chagua Kiwango Chako</h3>
+    <p class="text-sm text-muted-light dark:text-muted-dark mb-6 text-center">Lipa kwa M-Pesa, Tigo Pesa, au Airtel Money — moja kwa moja kutoka simu yako.</p>
+
+    <div id="orodhaYaMipango" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- Kadi za mipango zitaingizwa hapa na JavaScript -->
+    </div>
+
+    <!-- Fomu ya namba ya simu kwa malipo (inaonekana baada ya kuchagua kiwango) -->
+    <div id="fomuMalipo" class="hidden mt-6 border-t border-border-light dark:border-border-dark pt-5">
+      <p class="text-sm font-medium mb-2">Umechagua: <span id="jinaLaKiwangoKilichochaguliwa" class="text-accent"></span></p>
+
+      <label class="text-xs font-medium text-muted-light dark:text-muted-dark">Mtandao wako wa simu</label>
+      <select id="ingizoMtandao"
+        class="w-full mt-1 mb-3 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none focus:border-accent text-sm">
+        <option value="">-- Chagua mtandao --</option>
+      </select>
+
+      <label class="text-xs font-medium text-muted-light dark:text-muted-dark">Namba ya simu ya kulipia (Mobile Money)</label>
+      <div class="flex gap-2 mt-1">
+        <input type="tel" id="ingizoSimuMalipo" placeholder="07XXXXXXXX"
+          class="flex-1 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none focus:border-accent text-sm" />
+        <button id="btnLipa" class="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors whitespace-nowrap">
+          Lipa Sasa
+        </button>
+      </div>
+      <p id="hitilafuYaMalipo" class="hidden text-xs text-red-600 dark:text-red-400 mt-2"></p>
+      <p id="hali_yaMalipoUjumbe" class="hidden text-xs text-accent mt-2"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL YA DEVELOPER API ===================== -->
+<div id="modalDeveloper" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 overflow-y-auto py-8">
+  <div class="bg-panel-light dark:bg-panel-dark rounded-2xl shadow-xl w-full max-w-xl p-6 relative animate-fadeInUp">
+    <button class="btnFungaModal absolute top-4 right-4 text-muted-light dark:text-muted-dark hover:text-ink-light dark:hover:text-ink-dark">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <h3 class="font-display text-2xl font-medium mb-1">Developer API</h3>
+    <p class="text-sm text-muted-light dark:text-muted-dark mb-5">
+      Tumia SwahiliBot moja kwa moja kwenye programu/tovuti yako mwenyewe kupitia API key yako binafsi.
+    </p>
+
+    <div id="developerAkaunziRequired" class="hidden text-sm text-center py-8">
+      <p class="text-muted-light dark:text-muted-dark mb-3">Ingia kwenye akaunti yako kwanza kupata API key.</p>
+      <button id="btnDeveloperIngia" class="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-sm font-medium">Ingia</button>
+    </div>
+
+    <div id="developerMaudhui">
+      <label class="text-xs font-medium text-muted-light dark:text-muted-dark">API Key Yako</label>
+      <div class="flex gap-2 mt-1 mb-1">
+        <input id="ingizoApiKey" type="text" readonly placeholder="Bado hujatengeneza API key"
+          class="flex-1 px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark outline-none text-sm font-mono text-ink-light dark:text-ink-dark" />
+        <button id="btnNakiliApiKey" class="px-3 py-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-bg-light dark:hover:bg-bg-dark text-sm font-medium whitespace-nowrap">
+          Nakili
+        </button>
+      </div>
+      <button id="btnTengenezaApiKey" class="text-xs px-3 py-1.5 rounded-full bg-accent-soft dark:bg-accent/20 text-accent-hover dark:text-accent font-medium hover:brightness-95 transition mb-5">
+        Tengeneza / Badilisha API Key
+      </button>
+
+      <p class="text-xs font-semibold text-muted-light dark:text-muted-dark uppercase tracking-wide mb-2">Mfano wa Matumizi</p>
+      <pre class="bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark rounded-xl p-4 text-xs overflow-x-auto"><code id="kipandeChaMsimbo">curl -X POST https://yourdomain.com/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: sb_live_xxxxxxxxxxxxxxxx" \
+  -d '{"message": "Habari, unaweza kunisaidiaje?"}'</code></pre>
+
+      <p class="text-xs text-muted-light dark:text-muted-dark mt-4 leading-relaxed">
+        Jibu litarudi kama <code class="font-mono">{"reply": "..."}</code>. Weka historia ya mazungumzo kwenye
+        field ya hiari <code class="font-mono">history</code> (orodha ya <code class="font-mono">{role, content}</code>)
+        endapo unataka muktadha wa mazungumzo yaliyopita.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =====================================================================
+  // MIPANGILIO YA MSINGI
+  // =====================================================================
+  const ANWANI_YA_API = "/api/chat"; // Badilisha kama backend iko kwenye anwani tofauti
+
+  const eneoLaChat = document.getElementById("eneoLaChat");
+  const orodhaYaUjumbe = document.getElementById("orodhaYaUjumbe");
+  const ukaribishoWaAwali = document.getElementById("ukaribishoWaAwali");
+  const ingizoLaUjumbe = document.getElementById("ingizoLaUjumbe");
+  const btnTuma = document.getElementById("btnTuma");
+  const btnDarkMode = document.getElementById("btnDarkMode");
+  const iconMwezi = document.getElementById("iconMwezi");
+  const iconJua = document.getElementById("iconJua");
+  const btnMazungumzoMapya = document.getElementById("btnMazungumzoMapya");
+  const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+  const sidebar = document.getElementById("sidebar");
+
+  let historiaYaMazungumzo = []; // {role: 'user'|'assistant', content: '...'}
+  let inasubiriJibu = false;
+
+  // --- Vigezo vya AKAUNTI ---
+  const modalAkaunti = document.getElementById("modalAkaunti");
+  const kichwaChaModalAkaunti = document.getElementById("kichwaChaModalAkaunti");
+  const sehemuYaJina = document.getElementById("sehemuYaJina");
+  const ingizoJina = document.getElementById("ingizoJina");
+  const ingizoSimu = document.getElementById("ingizoSimu");
+  const ingizoPassword = document.getElementById("ingizoPassword");
+  const fomuAkaunti = document.getElementById("fomuAkaunti");
+  const hitilafuYaAkaunti = document.getElementById("hitilafuYaAkaunti");
+  const btnTumaFomuAkaunti = document.getElementById("btnTumaFomuAkaunti");
+  const maandishiYaKubadilisha = document.getElementById("maandishiYaKubadilisha");
+  const btnBadilishaHaliYaModal = document.getElementById("btnBadilishaHaliYaModal");
+  const btnFunguaIngia = document.getElementById("btnFunguaIngia");
+  const btnFunguaJisajili = document.getElementById("btnFunguaJisajili");
+  const btnToka = document.getElementById("btnToka");
+  const eneoLaKabalYaKuingia = document.getElementById("eneoLaKabalYaKuingia");
+  const eneoBaadaYaKuingia = document.getElementById("eneoBaadaYaKuingia");
+  const herufiYaJina = document.getElementById("herufiYaJina");
+  const kiashiriaMatumizi = document.getElementById("kiashiriaMatumizi");
+  const matumiziYaLeoEl = document.getElementById("matumiziYaLeo");
+  const kikomoChaSikuEl = document.getElementById("kikomoChaSiku");
+  const btnFungyaBei = document.getElementById("btnFungyaBei");
+
+  // --- Vigezo vya DEVELOPER API ---
+  const modalDeveloper = document.getElementById("modalDeveloper");
+  const developerAkaunziRequired = document.getElementById("developerAkaunziRequired");
+  const developerMaudhui = document.getElementById("developerMaudhui");
+  const ingizoApiKey = document.getElementById("ingizoApiKey");
+  const btnNakiliApiKey = document.getElementById("btnNakiliApiKey");
+  const btnTengenezaApiKey = document.getElementById("btnTengenezaApiKey");
+  const btnDeveloperIngia = document.getElementById("btnDeveloperIngia");
+
+  // --- Vigezo vya MALIPO ---
+  const modalBei = document.getElementById("modalBei");
+  const orodhaYaMipango = document.getElementById("orodhaYaMipango");
+  const fomuMalipo = document.getElementById("fomuMalipo");
+  const jinaLaKiwangoKilichochaguliwa = document.getElementById("jinaLaKiwangoKilichochaguliwa");
+  const ingizoSimuMalipo = document.getElementById("ingizoSimuMalipo");
+  const ingizoMtandao = document.getElementById("ingizoMtandao");
+  const btnLipa = document.getElementById("btnLipa");
+  const hitilafuYaMalipo = document.getElementById("hitilafuYaMalipo");
+  const hali_yaMalipoUjumbe = document.getElementById("hali_yaMalipoUjumbe");
+
+  let haliYaModalAkaunti = "ingia"; // "ingia" | "jisajili"
+  let kiwangoKilichochaguliwa = null;
+  let taarifaZaMtumiaji = null; // itajazwa baada ya kuangalia session
+
+  // =====================================================================
+  // DARK MODE
+  // =====================================================================
+  function wekaHaliYaMwonekano(giza) {
+    document.documentElement.classList.toggle("dark", giza);
+    iconMwezi.classList.toggle("hidden", giza);
+    iconJua.classList.toggle("hidden", !giza);
+    localStorage.setItem("swahilibot_giza", giza ? "1" : "0");
+  }
+
+  const pendekezoLaMfumo = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const kipimoKilichohifadhiwa = localStorage.getItem("swahilibot_giza");
+  wekaHaliYaMwonekano(
+    kipimoKilichohifadhiwa !== null ? kipimoKilichohifadhiwa === "1" : pendekezoLaMfumo
+  );
+
+  btnDarkMode.addEventListener("click", () => {
+    wekaHaliYaMwonekano(!document.documentElement.classList.contains("dark"));
+  });
+
+  // =====================================================================
+  // SIDEBAR (SIMU)
+  // =====================================================================
+  btnToggleSidebar?.addEventListener("click", () => {
+    sidebar.classList.toggle("hidden");
+    sidebar.classList.toggle("flex");
+  });
+
+  // =====================================================================
+  // KUANDIKA - AUTO RESIZE YA TEXTAREA
+  // =====================================================================
+  ingizoLaUjumbe.addEventListener("input", () => {
+    ingizoLaUjumbe.style.height = "auto";
+    ingizoLaUjumbe.style.height = Math.min(ingizoLaUjumbe.scrollHeight, 160) + "px";
+    btnTuma.disabled = ingizoLaUjumbe.value.trim().length === 0;
+  });
+
+  ingizoLaUjumbe.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      tumaUjumbe();
+    }
+  });
+
+  btnTuma.addEventListener("click", tumaUjumbe);
+
+  // Vitufe vya mapendekezo ya haraka
+  document.querySelectorAll(".pendekezo").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      ingizoLaUjumbe.value = btn.textContent.trim();
+      ingizoLaUjumbe.dispatchEvent(new Event("input"));
+      tumaUjumbe();
+    });
+  });
+
+  // =====================================================================
+  // MAZUNGUMZO MAPYA
+  // =====================================================================
+  btnMazungumzoMapya.addEventListener("click", () => {
+    historiaYaMazungumzo = [];
+    orodhaYaUjumbe.innerHTML = "";
+    orodhaYaUjumbe.appendChild(ukaribishoWaAwali);
+    ukaribishoWaAwali.classList.remove("hidden");
+  });
+
+  // =====================================================================
+  // AKAUNTI (AUTH) — kuangalia session, kuingia, kujisajili, kutoka
+  // =====================================================================
+
+  async function angaliaSessionYaSasa() {
+    try {
+      const jibu = await fetch("/api/mtumiaji");
+      const data = await jibu.json();
+      if (data.umeingia) {
+        taarifaZaMtumiaji = data;
+        onyeshaHaliYaAkauntiImeingia(data);
+      } else {
+        taarifaZaMtumiaji = null;
+        onyeshaHaliYaAkauntiHaijaIngia();
+      }
+    } catch (e) {
+      console.error("Imeshindikana kuangalia session:", e);
+    }
+  }
+
+  function onyeshaHaliYaAkauntiImeingia(data) {
+    eneoLaKabalYaKuingia.classList.add("hidden");
+    eneoBaadaYaKuingia.classList.remove("hidden");
+    eneoBaadaYaKuingia.classList.add("flex");
+    herufiYaJina.textContent = data.jina.trim().charAt(0).toUpperCase();
+    herufiYaJina.title = `${data.jina} — ${data.jina_la_kiwango}`;
+
+    kiashiriaMatumizi.classList.remove("hidden");
+    if (data.malipo_yamewashwa) {
+      matumiziYaLeoEl.textContent = data.matumizi_ya_leo;
+      kikomoChaSikuEl.textContent = data.kikomo_cha_siku;
+      btnFungyaBei.classList.remove("hidden");
+    } else {
+      // Malipo bado hayajawashwa - kila mtu ni BURE bila kikomo kwa sasa
+      kiashiriaMatumizi.innerHTML = '<span class="text-accent font-semibold">BURE</span> · hakuna kikomo kwa sasa';
+      btnFungyaBei.classList.add("hidden");
+    }
+  }
+
+  function onyeshaHaliYaAkauntiHaijaIngia() {
+    eneoLaKabalYaKuingia.classList.remove("hidden");
+    eneoBaadaYaKuingia.classList.add("hidden");
+    eneoBaadaYaKuingia.classList.remove("flex");
+    kiashiriaMatumizi.classList.add("hidden");
+    btnFungyaBei.classList.add("hidden");
+  }
+
+  function fungyaModalAkaunti(hali) {
+    haliYaModalAkaunti = hali;
+    hitilafuYaAkaunti.classList.add("hidden");
+    fomuAkaunti.reset();
+
+    if (hali === "jisajili") {
+      kichwaChaModalAkaunti.textContent = "Fungua akaunti";
+      sehemuYaJina.classList.remove("hidden");
+      btnTumaFomuAkaunti.textContent = "Jisajili";
+      maandishiYaKubadilisha.textContent = "Una akaunti tayari?";
+      btnBadilishaHaliYaModal.textContent = "Ingia";
+    } else {
+      kichwaChaModalAkaunti.textContent = "Karibu tena";
+      sehemuYaJina.classList.add("hidden");
+      btnTumaFomuAkaunti.textContent = "Ingia";
+      maandishiYaKubadilisha.textContent = "Huna akaunti?";
+      btnBadilishaHaliYaModal.textContent = "Jisajili";
+    }
+
+    modalAkaunti.classList.remove("hidden");
+    modalAkaunti.classList.add("flex");
+  }
+
+  btnFunguaIngia.addEventListener("click", () => fungyaModalAkaunti("ingia"));
+  btnFunguaJisajili.addEventListener("click", () => fungyaModalAkaunti("jisajili"));
+  btnBadilishaHaliYaModal.addEventListener("click", () => {
+    fungyaModalAkaunti(haliYaModalAkaunti === "ingia" ? "jisajili" : "ingia");
+  });
+
+  document.querySelectorAll(".btnFungaModal").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      modalAkaunti.classList.add("hidden");
+      modalAkaunti.classList.remove("flex");
+      modalBei.classList.add("hidden");
+      modalBei.classList.remove("flex");
+      modalDeveloper.classList.add("hidden");
+      modalDeveloper.classList.remove("flex");
+    });
+  });
+
+  // =====================================================================
+  // DEVELOPER API MODAL
+  // =====================================================================
+  function fungyaModalDeveloper() {
+    if (!taarifaZaMtumiaji) {
+      developerAkaunziRequired.classList.remove("hidden");
+      developerMaudhui.classList.add("hidden");
+    } else {
+      developerAkaunziRequired.classList.add("hidden");
+      developerMaudhui.classList.remove("hidden");
+      ingizoApiKey.value = taarifaZaMtumiaji.api_key || "";
+      ingizoApiKey.placeholder = taarifaZaMtumiaji.api_key ? "" : "Bado hujatengeneza API key";
+      sasishaKipandeChaMsimbo();
+    }
+    modalDeveloper.classList.remove("hidden");
+    modalDeveloper.classList.add("flex");
+  }
+
+  function sasishaKipandeChaMsimbo() {
+    const key = (taarifaZaMtumiaji && taarifaZaMtumiaji.api_key) || "sb_live_xxxxxxxxxxxxxxxx";
+    document.getElementById("kipandeChaMsimbo").textContent =
+`curl -X POST ${window.location.origin}/api/v1/chat \\
+  -H "Content-Type: application/json" \\
+  -H "X-API-KEY: ${key}" \\
+  -d '{"message": "Habari, unaweza kunisaidiaje?"}'`;
+  }
+
+  document.getElementById("btnDeveloperSidebar").addEventListener("click", fungyaModalDeveloper);
+
+  btnDeveloperIngia.addEventListener("click", () => {
+    modalDeveloper.classList.add("hidden");
+    modalDeveloper.classList.remove("flex");
+    fungyaModalAkaunti("ingia");
+  });
+
+  btnTengenezaApiKey.addEventListener("click", async () => {
+    btnTengenezaApiKey.disabled = true;
+    btnTengenezaApiKey.textContent = "Inatengeneza...";
+    try {
+      const jibu = await fetch("/api/developer/generate-key", { method: "POST" });
+      const data = await jibu.json();
+      if (!jibu.ok) throw new Error(data.error || "Imeshindikana");
+      taarifaZaMtumiaji.api_key = data.api_key;
+      ingizoApiKey.value = data.api_key;
+      sasishaKipandeChaMsimbo();
+    } catch (e) {
+      alert(e.message || "Imeshindikana kutengeneza API key. Jaribu tena.");
+    } finally {
+      btnTengenezaApiKey.disabled = false;
+      btnTengenezaApiKey.textContent = "Tengeneza / Badilisha API Key";
+    }
+  });
+
+  btnNakiliApiKey.addEventListener("click", () => {
+    if (!ingizoApiKey.value) return;
+    navigator.clipboard.writeText(ingizoApiKey.value);
+    const asili = btnNakiliApiKey.textContent;
+    btnNakiliApiKey.textContent = "Imenakiliwa!";
+    setTimeout(() => (btnNakiliApiKey.textContent = asili), 1500);
+  });
+
+  fomuAkaunti.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hitilafuYaAkaunti.classList.add("hidden");
+    btnTumaFomuAkaunti.disabled = true;
+
+    const njia = haliYaModalAkaunti === "jisajili" ? "/api/jisajili" : "/api/ingia";
+    const mzigo = { simu: ingizoSimu.value.trim(), password: ingizoPassword.value };
+    if (haliYaModalAkaunti === "jisajili") mzigo.jina = ingizoJina.value.trim();
+
+    try {
+      const jibu = await fetch(njia, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mzigo),
+      });
+      const data = await jibu.json();
+
+      if (!jibu.ok) {
+        hitilafuYaAkaunti.textContent = data.error || "Kumetokea hitilafu. Jaribu tena.";
+        hitilafuYaAkaunti.classList.remove("hidden");
+        return;
+      }
+
+      modalAkaunti.classList.add("hidden");
+      modalAkaunti.classList.remove("flex");
+      await angaliaSessionYaSasa();
+
+    } catch (kosa) {
+      hitilafuYaAkaunti.textContent = "Imeshindikana kuwasiliana na seva. Angalia mtandao wako.";
+      hitilafuYaAkaunti.classList.remove("hidden");
+      console.error(kosa);
+    } finally {
+      btnTumaFomuAkaunti.disabled = false;
+    }
+  });
+
+  btnToka.addEventListener("click", async () => {
+    await fetch("/api/toka", { method: "POST" });
+    taarifaZaMtumiaji = null;
+    onyeshaHaliYaAkauntiHaijaIngia();
+    btnMazungumzoMapya.click();
+  });
+
+  // =====================================================================
+  // MALIPO (ZENOPAY) — modal ya bei, kuanzisha malipo, kufuatilia hali
+  // =====================================================================
+
+  async function fungyaModalBei() {
+    try {
+      const jibu = await fetch("/api/malipo/mipango");
+      const mipango = await jibu.json();
+
+      orodhaYaMipango.innerHTML = "";
+      Object.entries(mipango).forEach(([kitufe, mpango]) => {
+        const niBure = kitufe === "bure";
+        const niKiwangoChaSasa = taarifaZaMtumiaji && taarifaZaMtumiaji.kiwango === kitufe;
+        const kadi = document.createElement("div");
+        kadi.className = `rounded-2xl border ${niBure ? "border-border-light dark:border-border-dark" : "border-accent"} p-5 flex flex-col`;
+
+        let maandishiYaKitufe = "Chagua Kiwango Hiki";
+        let kimezimwa = false;
+        if (niKiwangoChaSasa) {
+          maandishiYaKitufe = "Kiwango cha sasa";
+          kimezimwa = true;
+        } else if (niBure) {
+          maandishiYaKitufe = taarifaZaMtumiaji ? "Kiwango cha Bure" : "Anza Bure - Jisajili";
+          kimezimwa = !!taarifaZaMtumiaji;
+        }
+
+        kadi.innerHTML = `
+          <h4 class="font-display text-lg font-medium">${mpango.jina}</h4>
+          <p class="text-2xl font-semibold mt-2">${mpango.bei === 0 ? "Bure" : `TZS ${mpango.bei.toLocaleString()}`}<span class="text-xs font-normal text-muted-light dark:text-muted-dark">${mpango.bei === 0 ? "" : " / mwezi"}</span></p>
+          <p class="text-xs text-muted-light dark:text-muted-dark mt-2 flex-1">${mpango.maelezo}</p>
+          <p class="text-sm mt-3 mb-4">✅ Ujumbe ${mpango.kikomo_kwa_siku} kwa siku</p>
+          <button data-kiwango="${kitufe}" class="btnChaguaKiwango w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${kimezimwa ? "bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark cursor-default" : "bg-accent hover:bg-accent-hover text-white"}" ${kimezimwa ? "disabled" : ""}>
+            ${maandishiYaKitufe}
+          </button>
+        `;
+        orodhaYaMipango.appendChild(kadi);
+      });
+
+      document.querySelectorAll(".btnChaguaKiwango:not([disabled])").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const kitufe = btn.dataset.kiwango;
+
+          // Bure ikichaguliwa na mtu asiyeingia -> mpeleke kwenye usajili
+          if (kitufe === "bure" && !taarifaZaMtumiaji) {
+            modalBei.classList.add("hidden");
+            modalBei.classList.remove("flex");
+            fungyaModalAkaunti("jisajili");
+            return;
+          }
+
+          // Mipango ya malipo ikichaguliwa na mtu asiyeingia -> mtakiwe kuingia kwanza
+          if (!taarifaZaMtumiaji) {
+            modalBei.classList.add("hidden");
+            modalBei.classList.remove("flex");
+            fungyaModalAkaunti("jisajili");
+            return;
+          }
+
+          kiwangoKilichochaguliwa = kitufe;
+          jinaLaKiwangoKilichochaguliwa.textContent = mipango[kitufe].jina;
+          fomuMalipo.classList.remove("hidden");
+          hitilafuYaMalipo.classList.add("hidden");
+          hali_yaMalipoUjumbe.classList.add("hidden");
+          ingizoSimuMalipo.value = taarifaZaMtumiaji.simu || "";
+          pakiaMitandaoYaSimu();
+        });
+      });
+
+    } catch (e) {
+      console.error("Imeshindikana kupakia mipango:", e);
+    }
+
+    modalBei.classList.remove("hidden");
+    modalBei.classList.add("flex");
+  }
+
+  async function pakiaMitandaoYaSimu() {
+    ingizoMtandao.innerHTML = `<option value="">-- Inapakia mitandao... --</option>`;
+    try {
+      const jibu = await fetch("/api/malipo/mitandao");
+      const mitandao = await jibu.json();
+      ingizoMtandao.innerHTML = `<option value="">-- Chagua mtandao --</option>`;
+      Object.entries(mitandao).forEach(([ufunguo, taarifa]) => {
+        const chaguo = document.createElement("option");
+        chaguo.value = ufunguo;
+        chaguo.textContent = taarifa.jina;
+        ingizoMtandao.appendChild(chaguo);
+      });
+    } catch (e) {
+      ingizoMtandao.innerHTML = `<option value="">-- Imeshindwa kupakia mitandao --</option>`;
+      console.error("Imeshindikana kupakia mitandao:", e);
+    }
+  }
+
+  btnFungyaBei.addEventListener("click", fungyaModalBei);
+  document.getElementById("btnFungyaBeiSidebar").addEventListener("click", fungyaModalBei);
+
+  btnLipa.addEventListener("click", async () => {
+    hitilafuYaMalipo.classList.add("hidden");
+    hali_yaMalipoUjumbe.classList.add("hidden");
+
+    const simu = ingizoSimuMalipo.value.trim();
+    const mtandao = ingizoMtandao.value;
+
+    if (!mtandao) {
+      hitilafuYaMalipo.textContent = "Tafadhali chagua mtandao wako wa simu.";
+      hitilafuYaMalipo.classList.remove("hidden");
+      return;
+    }
+    if (!/^0[67]\d{8}$/.test(simu)) {
+      hitilafuYaMalipo.textContent = "Tafadhali weka namba sahihi ya simu (mfano 0744XXXXXX).";
+      hitilafuYaMalipo.classList.remove("hidden");
+      return;
+    }
+
+    btnLipa.disabled = true;
+    btnLipa.textContent = "Inatuma ombi...";
+
+    try {
+      const jibu = await fetch("/api/malipo/anzisha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kiwango: kiwangoKilichochaguliwa, simu, mtandao }),
+      });
+      const data = await jibu.json();
+
+      if (!jibu.ok) {
+        hitilafuYaMalipo.textContent = data.error || "Malipo hayakufanikiwa kuanzishwa.";
+        hitilafuYaMalipo.classList.remove("hidden");
+        return;
+      }
+
+      hali_yaMalipoUjumbe.textContent = data.ujumbe;
+      hali_yaMalipoUjumbe.classList.remove("hidden");
+      fuatiliaHaliYaMalipo(data.order_id);
+
+    } catch (e) {
+      hitilafuYaMalipo.textContent = "Imeshindikana kuwasiliana na seva ya malipo.";
+      hitilafuYaMalipo.classList.remove("hidden");
+      console.error(e);
+    } finally {
+      btnLipa.disabled = false;
+      btnLipa.textContent = "Lipa Sasa";
+    }
+  });
+
+  function fuatiliaHaliYaMalipo(orderId) {
+    let idadiYaKujaribu = 0;
+    const muda = setInterval(async () => {
+      idadiYaKujaribu++;
+      try {
+        const jibu = await fetch(`/api/malipo/hali?order_id=${encodeURIComponent(orderId)}`);
+        const data = await jibu.json();
+
+        if (data.hali === "COMPLETED") {
+          clearInterval(muda);
+          hali_yaMalipoUjumbe.textContent = "🎉 Malipo yamekamilika! Kiwango chako kimeboreshwa.";
+          await angaliaSessionYaSasa();
+          setTimeout(() => {
+            modalBei.classList.add("hidden");
+            modalBei.classList.remove("flex");
+            fomuMalipo.classList.add("hidden");
+          }, 2000);
+        } else if (data.hali === "FAILED" || data.hali === "CANCELLED") {
+          clearInterval(muda);
+          hitilafuYaMalipo.textContent = "Malipo hayakufanikiwa au yamesitishwa. Jaribu tena.";
+          hitilafuYaMalipo.classList.remove("hidden");
+          hali_yaMalipoUjumbe.classList.add("hidden");
+        }
+      } catch (e) {
+        console.error("Hitilafu ya kufuatilia malipo:", e);
+      }
+
+      if (idadiYaKujaribu >= 18) clearInterval(muda); // Acha baada ya ~dakika 3
+    }, 10000);
+  }
+
+  // =====================================================================
+  // KUTUMA UJUMBE
+  // =====================================================================
+  async function tumaUjumbe() {
+    const maandishi = ingizoLaUjumbe.value.trim();
+    if (!maandishi || inasubiriJibu) return;
+
+    if (!taarifaZaMtumiaji) {
+      fungyaModalAkaunti("jisajili");
+      return;
+    }
+
+    ukaribishoWaAwali.classList.add("hidden");
+
+    // Onyesha ujumbe wa mtumiaji
+    ongezaUjumbeKwenyeSkrini("user", maandishi);
+    historiaYaMazungumzo.push({ role: "user", content: maandishi });
+
+    // Safisha eneo la kuandika
+    ingizoLaUjumbe.value = "";
+    ingizoLaUjumbe.style.height = "auto";
+    btnTuma.disabled = true;
+    inasubiriJibu = true;
+
+    // Onyesha "inaandika..."
+    const kipengeleChaKuandika = ongezaKipengeleChaKuandika();
+
+    try {
+      const jibu = await fetch(ANWANI_YA_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: historiaYaMazungumzo }),
+      });
+
+      const data = await jibu.json();
+      kipengeleChaKuandika.remove();
+
+      if (jibu.status === 401 && data.inahitaji_kuingia) {
+        historiaYaMazungumzo.pop();
+        fungyaModalAkaunti("ingia");
+        return;
+      }
+
+      if (jibu.status === 403 && data.kikomo_kimefikiwa) {
+        ongezaUjumbeKwenyeSkrini("assistant", data.error, true);
+        fungyaModalBei();
+        return;
+      }
+
+      if (!jibu.ok) {
+        ongezaUjumbeKwenyeSkrini(
+          "assistant",
+          data.error || "Samahani, kumetokea hitilafu. Tafadhali jaribu tena.",
+          true
+        );
+        return;
+      }
+
+      ongezaUjumbeKwenyeSkrini("assistant", data.reply);
+      historiaYaMazungumzo.push({ role: "assistant", content: data.reply });
+
+      if (typeof data.matumizi_ya_leo === "number") {
+        matumiziYaLeoEl.textContent = data.matumizi_ya_leo;
+        kikomoChaSikuEl.textContent = data.kikomo_cha_siku;
+      }
+
+    } catch (kosa) {
+      kipengeleChaKuandika.remove();
+      ongezaUjumbeKwenyeSkrini(
+        "assistant",
+        "Samahani, imeshindikana kuwasiliana na seva. Hakikisha una mtandao wa intaneti kisha jaribu tena.",
+        true
+      );
+      console.error("Hitilafu:", kosa);
+    } finally {
+      inasubiriJibu = false;
+    }
+  }
+
+  // =====================================================================
+  // KUONGEZA UJUMBE KWENYE SKRINI
+  // =====================================================================
+  function ongezaUjumbeKwenyeSkrini(jukumu, maandishi, niHitilafu = false) {
+    const niMtumiaji = jukumu === "user";
+
+    const kifungashio = document.createElement("div");
+    kifungashio.className = `flex gap-3 animate-fadeInUp ${niMtumiaji ? "justify-end" : "justify-start"}`;
+
+    let vibubbuleHtml = "";
+
+    if (!niMtumiaji) {
+      vibubbuleHtml += `
+        <div class="w-8 h-8 shrink-0 rounded-lg bg-accent flex items-center justify-center text-white font-display text-sm font-semibold">S</div>
+      `;
+    }
+
+    const rangiYaBubble = niMtumiaji
+      ? "bg-accent text-white rounded-2xl rounded-br-md"
+      : niHitilafu
+        ? "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 rounded-2xl rounded-bl-md border border-red-200 dark:border-red-900"
+        : "bg-panel-light dark:bg-panel-dark rounded-2xl rounded-bl-md border border-border-light dark:border-border-dark";
+
+    vibubbuleHtml += `
+      <div class="max-w-[85%] md:max-w-[75%]">
+        <div class="${rangiYaBubble} px-4 py-2.5 text-sm md:text-[15px] leading-relaxed prose-msg">
+          ${badiliMarkdownRahisi(maandishi)}
+        </div>
+      </div>
+    `;
+
+    if (niMtumiaji) {
+      vibubbuleHtml += `
+        <div class="w-8 h-8 shrink-0 rounded-lg bg-ink-light dark:bg-ink-dark flex items-center justify-center text-bg-light dark:text-bg-dark text-xs font-semibold">Wewe</div>
+      `;
+    }
+
+    kifungashio.innerHTML = vibubbuleHtml;
+    orodhaYaUjumbe.appendChild(kifungashio);
+    panguzaChiniKabisa();
+  }
+
+  // Kigeuzi rahisi cha alama za msingi za Markdown (** ** na ```code```)
+  function badiliMarkdownRahisi(maandishi) {
+    let mtn = maandishi
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Vipande vya code (```...```)
+    mtn = mtn.replace(/```([\s\S]*?)```/g, (m, code) => `<pre><code>${code.trim()}</code></pre>`);
+    // Code fupi (`...`)
+    mtn = mtn.replace(/`([^`]+)`/g, "<code>$1</code>");
+    // Herufi nzito (**...**)
+    mtn = mtn.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    // Mistari mipya
+    mtn = mtn.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+
+    return mtn;
+  }
+
+  // =====================================================================
+  // KIASHIRIA CHA "INAANDIKA..." (LOADING ANIMATION)
+  // =====================================================================
+  function ongezaKipengeleChaKuandika() {
+    const kifungashio = document.createElement("div");
+    kifungashio.className = "flex gap-3 justify-start animate-fadeInUp";
+    kifungashio.innerHTML = `
+      <div class="w-8 h-8 shrink-0 rounded-lg bg-accent flex items-center justify-center text-white font-display text-sm font-semibold">S</div>
+      <div class="bg-panel-light dark:bg-panel-dark border border-border-light dark:border-border-dark rounded-2xl rounded-bl-md px-4 py-3.5 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-muted-light dark:bg-muted-dark animate-bounce1 dot" style="--delay:0s"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-muted-light dark:bg-muted-dark animate-bounce1 dot" style="--delay:0.15s"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-muted-light dark:bg-muted-dark animate-bounce1 dot" style="--delay:0.3s"></span>
+      </div>
+    `;
+    orodhaYaUjumbe.appendChild(kifungashio);
+    panguzaChiniKabisa();
+    return kifungashio;
+  }
+
+  function panguzaChiniKabisa() {
+    requestAnimationFrame(() => {
+      eneoLaChat.scrollTop = eneoLaChat.scrollHeight;
+    });
+  }
+
+  // Angalia kama mtumiaji tayari ameingia (session) mara ukurasa unapopakia
+  angaliaSessionYaSasa();
+</script>
+
+</body>
+</html>

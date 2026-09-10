@@ -39,7 +39,7 @@ ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 load_dotenv()
 
 # Funguo yako ya OpenRouter imewekwa hapa moja kwa moja ili kuzuia kosa la .env
-DEEPSEEK_API_KEY = "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"
+DEEPSEEK_API_KEY = ""
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
 QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")

@@ -1,10 +1,11 @@
 import os
 import logging
+from flask import Flask, request, jsonify, render_string, session, render_template
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Kodi sasa hivi inasoma vigeuzi rasmi kutoka Render Environment
+# Vigeuzi vya siri kutoka Render Environment
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
@@ -13,20 +14,21 @@ QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
 ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-# Barabara zote zimeelekezwa OpenRouter ili kusoma Ox Alpha/Qwen ya bure
+# Barabara kamili na ndefu ya OpenRouter ili kuzuia kosa la 405 na kache ya .env
 DEEPSEEK_API_URL = "https://openrouter.ai"
 CLAUDE_API_URL = "https://anthropic.com"
 CLAUDE_API_VERSION = "2023-06-01"
 OXALPHA_API_URL = "https://openrouter.ai"
 QWEN_API_URL = "https://openrouter.ai"
 
-# Tunatumia model ya bure kabisa ya Qwen au Ox Alpha kupitia OpenRouter
+# Tunalazimisha kutumia akili ya Ox Alpha ya bure (glm-5.3-flash)
 DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 OXALPHA_MODEL = "z-ai/glm-5.3-flash"
 QWEN_MODEL = "z-ai/glm-5.3-flash"
 
 REQUEST_TIMEOUT = 60
+
 
 
 # Anwani kamili ya tovuti yako (inahitajika kwa ajili ya webhook ya ZenoPay).

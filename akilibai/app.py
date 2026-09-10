@@ -1,43 +1,29 @@
-"""
-=====================================================================
- SwahiliBot - AI Chatbot kwa Watumiaji wa Afrika
- Backend: Flask + Dual-API Routing Engine (DeepSeek + Claude)
-           + Akaunti za Watumiaji + Vikomo vya Matumizi + Malipo (ZenoPay)
-=====================================================================
+load_dotenv()
 
-Faili hii inashughulikia:
-  1. Kuhudumia ukurasa wa mbele (index.html)
-  2. Usajili/kuingia kwa watumiaji (akaunti rahisi kwa namba ya simu)
-  3. Kupokea ujumbe wa mtumiaji kupitia /api/chat, kutambua lugha yake,
-     kuchunguza ugumu wa ujumbe, na kuchagua DeepSeek au Claude
-  4. Kudhibiti vikomo vya ujumbe kwa siku kulingana na mpango wa mtumiaji
-  5. Kuanzisha na kuthibitisha malipo ya Mobile Money (M-Pesa/Tigo Pesa/
-     Airtel Money) kupitia ZenoPay ili kuboresha mpango wa mtumiaji
+# Kodi sasa hivi inasoma vigeuzi rasmi kutoka Render Environment
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
+QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 
-Muundo wa majibu (API contract) umelandanishwa moja kwa moja na JS
-iliyopo kwenye index.html - usibadilishe majina ya "fields" bila
-kubadilisha pia index.html.
-=====================================================================
-"""
+PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
+ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-import os
-import re
-import secrets
-import logging
-from functools import wraps
+# Barabara zote zimeelekezwa OpenRouter ili kusoma Ox Alpha/Qwen ya bure
+DEEPSEEK_API_URL = "https://openrouter.ai"
+CLAUDE_API_URL = "https://anthropic.com"
+CLAUDE_API_VERSION = "2023-06-01"
+OXALPHA_API_URL = "https://openrouter.ai"
+QWEN_API_URL = "https://openrouter.ai"
 
-import requests
-from flask import Flask, request, jsonify, send_from_directory, session
-from flask_cors import CORS
-from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash, check_password_hash
+# Tunatumia model ya bure kabisa ya Qwen au Ox Alpha kupitia OpenRouter
+DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
+CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
+OXALPHA_MODEL = "z-ai/glm-5.3-flash"
+QWEN_MODEL = "z-ai/glm-5.3-flash"
 
-import database as db
-import malipo
+REQUEST_TIMEOUT = 60
 
-# ---------------------------------------------------------------------------
-# 1. USANIDI WA AWALI (INITIAL SETUP)
-# ---------------------------------------------------------------------------
 
 load_dotenv()
 

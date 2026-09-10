@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, request, jsonify, render_string, session, render_template
+from flask import Flask, request, jsonify, render_template, session
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,20 +14,21 @@ QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
 ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-# Barabara kamili na ndefu ya OpenRouter ili kuzuia kosa la 405 na kache ya .env
+# URL zote zimeandikwa kwa njia ndefu na kamili hapa hapa kwenye msimbo
 DEEPSEEK_API_URL = "https://openrouter.ai"
 CLAUDE_API_URL = "https://anthropic.com"
 CLAUDE_API_VERSION = "2023-06-01"
 OXALPHA_API_URL = "https://openrouter.ai"
 QWEN_API_URL = "https://openrouter.ai"
 
-# Tunalazimisha kutumia akili ya Ox Alpha ya bure (glm-5.3-flash)
+# Model ya bure ya Ox Alpha (glm-5.3-flash) kupitia OpenRouter
 DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 OXALPHA_MODEL = "z-ai/glm-5.3-flash"
 QWEN_MODEL = "z-ai/glm-5.3-flash"
 
 REQUEST_TIMEOUT = 60
+
 
 
 

@@ -57,7 +57,8 @@ PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true
 # Mfano: https://swahilibot.onrender.com  (bila '/' mwishoni)
 ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_API_URL = "https://openrouter.ai"
+"
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 CLAUDE_API_VERSION = "2023-06-01"
 OXALPHA_API_URL = os.getenv("OXALPHA_BASE_URL", "https://tokenra.io/v1") + "/chat/completions"

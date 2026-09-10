@@ -57,19 +57,32 @@ PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true
 # Mfano: https://swahilibot.onrender.com  (bila '/' mwishoni)
 ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-DEEPSEEK_API_URL = "https://openrouter.ai"
-"
-CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
-CLAUDE_API_VERSION = "2023-06-01"
-OXALPHA_API_URL = os.getenv("OXALPHA_BASE_URL", "https://tokenra.io/v1") + "/chat/completions"
-QWEN_API_URL = os.getenv("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1") + "/chat/completions"
+load_dotenv()
 
-DEEPSEEK_MODEL = "deepseek-chat"
+# Funguo yako ya OpenRouter imewekwa hapa moja kwa moja ili kuzuia kosa la .env
+DEEPSEEK_API_KEY = "sk-or-v1-hapa-weka-ile-key-yako-halisi-ya-openrouter-iliyobaki"
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
+QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
+
+PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
+ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
+
+# Barabara zote zimeelekezwa OpenRouter ya bure sasa hivi
+DEEPSEEK_API_URL = "https://openrouter.ai"
+CLAUDE_API_URL = "https://anthropic.com"
+CLAUDE_API_VERSION = "2023-06-01"
+OXALPHA_API_URL = "https://openrouter.ai"
+QWEN_API_URL = "https://openrouter.ai"
+
+# Model ya bure kabisa ya Ox Alpha
+DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
-OXALPHA_MODEL = os.getenv("OXALPHA_MODEL", "stealth/ox-alpha")
-QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen-plus")
+OXALPHA_MODEL = "z-ai/glm-5.3-flash"
+QWEN_MODEL = "z-ai/glm-5.3-flash"
 
 REQUEST_TIMEOUT = 60
+
 
 logging.basicConfig(
     level=logging.INFO,

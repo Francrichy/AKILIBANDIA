@@ -1,3 +1,7 @@
+import os
+import logging
+from dotenv import load_dotenv
+
 load_dotenv()
 
 # Kodi sasa hivi inasoma vigeuzi rasmi kutoka Render Environment
@@ -24,20 +28,6 @@ QWEN_MODEL = "z-ai/glm-5.3-flash"
 
 REQUEST_TIMEOUT = 60
 
-
-load_dotenv()
-
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
-QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
-
-# Endapo False (chaguo-msingi kwa sasa), kila mtumiaji anatumia BURE bila
-# kikomo cha malipo - vikomo vya kila siku havitekelezwi. Njia za malipo
-# (PawaPay) zinabaki tayari kwenye msimbo, tayari kuwashwa wakati wowote
-# kwa kubadilisha PAYMENT_ENABLED=True kwenye .env - hakuna kuandika upya
-# msimbo kunakohitajika baadaye.
-PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
 
 # Anwani kamili ya tovuti yako (inahitajika kwa ajili ya webhook ya ZenoPay).
 # Mfano: https://swahilibot.onrender.com  (bila '/' mwishoni)

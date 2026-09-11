@@ -232,7 +232,7 @@ def piga_simu_oxalpha(historia_ya_mazungumzo):
     ujumbe wote (rahisi na migumu), kwa sababu haina gharama. Inafikiwa
     kupitia TokenRa (tokenra.io) - endpoint ya 'OpenAI-compatible'.
     """
-    return _piga_simu_openai_compatible(OXALPHA_API_URL, OXALPHA_API_KEY, OXALPHA_MODEL, historia_ya_mazungumzo, "Oxalpha")
+    return _piga_simu_openai_compatible(OXALPHA_API_URL, OPENROUTER_API_KEY, OXALPHA_MODEL, historia_ya_mazungumzo, "Oxalpha")
 
 
 def piga_simu_qwen(historia_ya_mazungumzo):
@@ -681,7 +681,7 @@ def afya():
     return jsonify({
         "hali": "sawa",
         "malipo_yamewashwa": PAYMENT_ENABLED,
-        "oxalpha_key_imewekwa": bool(OXALPHA_API_KEY),
+        "oxalpha_key_imewekwa": bool(OPENROUTER_API_KEY),
         "deepseek_key_imewekwa": bool(DEEPSEEK_API_KEY),
         "qwen_key_imewekwa": bool(QWEN_API_KEY),
         "claude_key_imewekwa": bool(ANTHROPIC_API_KEY),

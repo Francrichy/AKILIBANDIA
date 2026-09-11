@@ -67,7 +67,7 @@ DEEPSEEK_MODEL = "deepseek-chat"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 OXALPHA_MODEL = os.getenv("OXALPHA_MODEL", "z-ai/glm-5.2:free")
 QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen-plus")
-Switch to working free model
+
 REQUEST_TIMEOUT = 60
 
 logging.basicConfig(

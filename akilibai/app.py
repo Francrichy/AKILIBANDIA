@@ -65,7 +65,7 @@ QWEN_API_URL = os.getenv("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/c
 
 DEEPSEEK_MODEL = "deepseek-chat"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
-OXALPHA_MODEL = os.getenv("OXALPHA_MODEL", "z-ai/glm-5.2:free")
+OXALPHA_MODEL = os.getenv("OXALPHA_MODEL", "z-ai/glm-5.3-flash")
 QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen-plus")
 
 REQUEST_TIMEOUT = 60

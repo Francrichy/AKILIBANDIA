@@ -43,7 +43,7 @@ load_dotenv()
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-OPENROUTER_API_KEY = os.getenv("OXALPHA_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 
 # Endapo False (chaguo-msingi kwa sasa), kila mtumiaji anatumia BURE bila

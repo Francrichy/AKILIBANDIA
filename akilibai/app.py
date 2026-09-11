@@ -43,7 +43,7 @@ load_dotenv()
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OXALPHA_API_KEY", "")
 QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 
 # Endapo False (chaguo-msingi kwa sasa), kila mtumiaji anatumia BURE bila
@@ -60,7 +60,7 @@ ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 CLAUDE_API_VERSION = "2023-06-01"
-OXALPHA_API_URL = os.getenv("OXALPHA_BASE_URL", "https://tokenra.io/v1") + "/chat/completions"
+OXALPHA_API_URL = os.getenv("OXALPHA_BASE_URL", "https://openrouter.ai/api/v1") + "/chat/completions"
 QWEN_API_URL = os.getenv("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1") + "/chat/completions"
 
 DEEPSEEK_MODEL = "deepseek-chat"

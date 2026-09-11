@@ -1,67 +1,74 @@
+"""
+=====================================================================
+ SwahiliBot - AI Chatbot kwa Watumiaji wa Afrika
+ Backend: Flask + Dual-API Routing Engine (DeepSeek + Claude)
+           + Akaunti za Watumiaji + Vikomo vya Matumizi + Malipo (ZenoPay)
+=====================================================================
+
+Faili hii inashughulikia:
+  1. Kuhudumia ukurasa wa mbele (index.html)
+  2. Usajili/kuingia kwa watumiaji (akaunti rahisi kwa namba ya simu)
+  3. Kupokea ujumbe wa mtumiaji kupitia /api/chat, kutambua lugha yake,
+     kuchunguza ugumu wa ujumbe, na kuchagua DeepSeek au Claude
+  4. Kudhibiti vikomo vya ujumbe kwa siku kulingana na mpango wa mtumiaji
+  5. Kuanzisha na kuthibitisha malipo ya Mobile Money (M-Pesa/Tigo Pesa/
+     Airtel Money) kupitia ZenoPay ili kuboresha mpango wa mtumiaji
+
+Muundo wa majibu (API contract) umelandanishwa moja kwa moja na JS
+iliyopo kwenye index.html - usibadilishe majina ya "fields" bila
+kubadilisha pia index.html.
+=====================================================================
+"""
+
 import os
+import re
+import secrets
 import logging
-from flask import Flask, request, jsonify, render_template, session
+from functools import wraps
+
+import requests
+from flask import Flask, request, jsonify, send_from_directory, session
+from flask_cors import CORS
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
+
+import database as db
+import malipo
+
+# ---------------------------------------------------------------------------
+# 1. USANIDI WA AWALI (INITIAL SETUP)
+# ---------------------------------------------------------------------------
 
 load_dotenv()
 
-# Vigeuzi vya siri kutoka Render Environment
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
 QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
 
+# Endapo False (chaguo-msingi kwa sasa), kila mtumiaji anatumia BURE bila
+# kikomo cha malipo - vikomo vya kila siku havitekelezwi. Njia za malipo
+# (PawaPay) zinabaki tayari kwenye msimbo, tayari kuwashwa wakati wowote
+# kwa kubadilisha PAYMENT_ENABLED=True kwenye .env - hakuna kuandika upya
+# msimbo kunakohitajika baadaye.
 PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
-ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
-
-# URL zote zimeandikwa kwa njia ndefu na kamili hapa hapa kwenye msimbo
-DEEPSEEK_API_URL = "https://openrouter.ai"
-CLAUDE_API_URL = "https://anthropic.com"
-CLAUDE_API_VERSION = "2023-06-01"
-OXALPHA_API_URL = "https://openrouter.ai"
-QWEN_API_URL = "https://openrouter.ai"
-
-# Model ya bure ya Ox Alpha (glm-5.3-flash) kupitia OpenRouter
-DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
-CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
-OXALPHA_MODEL = "z-ai/glm-5.3-flash"
-QWEN_MODEL = "z-ai/glm-5.3-flash"
-
-REQUEST_TIMEOUT = 60
-
-
-
 
 # Anwani kamili ya tovuti yako (inahitajika kwa ajili ya webhook ya ZenoPay).
 # Mfano: https://swahilibot.onrender.com  (bila '/' mwishoni)
 ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
 
-load_dotenv()
-
-# Funguo yako ya OpenRouter imewekwa hapa moja kwa moja ili kuzuia kosa la .env
-DEEPSEEK_API_KEY = ""
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-OXALPHA_API_KEY = os.getenv("OXALPHA_API_KEY", "")
-QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
-
-PAYMENT_ENABLED = os.getenv("PAYMENT_ENABLED", "False").strip().lower() == "true"
-ANWANI_YA_TOVUTI = os.getenv("SITE_URL", "http://localhost:5000")
-
-# Barabara zote zimeelekezwa OpenRouter ya bure sasa hivi
-DEEPSEEK_API_URL = "https://openrouter.ai"
-CLAUDE_API_URL = "https://anthropic.com"
+DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
+CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 CLAUDE_API_VERSION = "2023-06-01"
-OXALPHA_API_URL = "https://openrouter.ai"
-QWEN_API_URL = "https://openrouter.ai"
+OXALPHA_API_URL = os.getenv("OXALPHA_BASE_URL", "https://tokenra.io/v1") + "/chat/completions"
+QWEN_API_URL = os.getenv("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1") + "/chat/completions"
 
-# Model ya bure kabisa ya Ox Alpha
-DEEPSEEK_MODEL = "z-ai/glm-5.3-flash"
+DEEPSEEK_MODEL = "deepseek-chat"
 CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
-OXALPHA_MODEL = "z-ai/glm-5.3-flash"
-QWEN_MODEL = "z-ai/glm-5.3-flash"
+OXALPHA_MODEL = os.getenv("OXALPHA_MODEL", "stealth/ox-alpha")
+QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen-plus")
 
 REQUEST_TIMEOUT = 60
-
 
 logging.basicConfig(
     level=logging.INFO,
